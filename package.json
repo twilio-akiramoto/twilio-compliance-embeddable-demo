@@ -1,0 +1,25 @@
+{
+  "name": "twilio-compliance-embeddable-demo",
+  "version": "1.0.0",
+  "description": "Demo application showcasing Twilio ISV Compliance Embeddable integration",
+  "private": true,
+  "scripts": {
+    "install-all": "cd backend && npm install && cd ../frontend && npm install",
+    "start-backend": "cd backend && npm start",
+    "start-frontend": "cd frontend && npm start",
+    "dev-backend": "cd backend && npm run dev",
+    "dev": "concurrently \"npm run dev-backend\" \"npm run start-frontend\""
+  },
+  "keywords": [
+    "twilio",
+    "compliance",
+    "embeddable",
+    "isv",
+    "demo"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
