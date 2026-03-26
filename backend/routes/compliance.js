@@ -35,20 +35,36 @@ function errorResponse(error) {
  */
 router.post('/tollfree/initialize', async (req, res) => {
   try {
-    const { friendlyName, notificationEmail, phoneNumberType, endUserType } = req.body;
+    const {
+      tollfreePhoneNumber,
+      notificationEmail,
+      businessName,
+      businessWebsite,
+      useCaseCategories,
+      useCaseSummary
+    } = req.body;
 
     // Validation
-    if (!friendlyName || !notificationEmail) {
+    if (!tollfreePhoneNumber || !notificationEmail) {
       return res.status(400).json(errorResponse(
-        new Error('friendlyName and notificationEmail are required')
+        new Error('tollfreePhoneNumber and notificationEmail are required')
+      ));
+    }
+
+    // Validate phone number format (basic check for toll-free numbers)
+    if (!tollfreePhoneNumber.match(/^\+1(800|888|877|866|855|844|833)/)) {
+      return res.status(400).json(errorResponse(
+        new Error('tollfreePhoneNumber must be a valid US toll-free number in E.164 format (e.g., +18005551234)')
       ));
     }
 
     const result = await initializeTollFree({
-      friendlyName,
+      tollfreePhoneNumber,
       notificationEmail,
-      phoneNumberType: phoneNumberType || 'tollfree',
-      endUserType: endUserType || 'Business'
+      businessName,
+      businessWebsite,
+      useCaseCategories,
+      useCaseSummary
     });
 
     // Save to storage
@@ -57,7 +73,8 @@ router.post('/tollfree/initialize', async (req, res) => {
       product: 'tollfree',
       registrationId: result.registrationId,
       status: 'initialized',
-      friendlyName
+      tollfreePhoneNumber,
+      businessName
     });
 
     res.json(successResponse(result));

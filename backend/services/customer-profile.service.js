@@ -20,18 +20,24 @@ async function initializeCustomerProfile(params) {
     console.log('🏢 Initializing Customer Profile inquiry...');
     console.log('Using Primary Profile SID:', primaryProfileSid);
 
-    const response = await client.trusthub.v1.complianceInquiries.customers.initialize
-      .create({
-        primaryProfileSid,
-        notificationEmail
-      });
+    // Build request parameters
+    const requestParams = {
+      primaryProfileSid
+    };
+
+    if (notificationEmail) {
+      requestParams.notificationEmail = notificationEmail;
+    }
+
+    const response = await client.trusthub.v1.complianceInquiries
+      .create(requestParams);
 
     console.log('✅ Customer Profile inquiry initialized:', response.inquiryId);
 
     // Extract BU SID from customer_id
     // Format: tri1.us1.trusthub.<<Your ASID>>.customer.<<Bundle SID>>
     const customerId = response.customerId;
-    const bundleSid = customerId.split('.').pop();
+    const bundleSid = customerId ? customerId.split('.').pop() : null;
 
     return {
       inquiryId: response.inquiryId,
@@ -62,10 +68,8 @@ async function resumeCustomerProfile(customerId) {
 
     console.log('🔄 Resuming Customer Profile inquiry:', customerId);
 
-    const response = await client.trusthub.v1.complianceInquiries
-      .customers(customerId)
-      .initialize
-      .create({
+    const response = await client.trusthub.v1.complianceInquiries(customerId)
+      .update({
         primaryProfileSid
       });
 

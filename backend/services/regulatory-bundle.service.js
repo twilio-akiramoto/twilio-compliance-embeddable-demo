@@ -69,7 +69,8 @@ async function initializeRegulatoryBundle(params) {
       }
     });
 
-    const data = response.data;
+    // Response is wrapped in a data object
+    const data = response.data.data;
     console.log('✅ Regulatory Bundle inquiry initialized:', data.inquiry_id);
 
     // Extract Bundle SID from compliance_registration_id
@@ -111,7 +112,8 @@ async function resumeRegulatoryBundle(registrationId) {
       }
     });
 
-    const data = response.data;
+    // Response is wrapped in a data object
+    const data = response.data.data;
     console.log('✅ Regulatory Bundle inquiry resumed:', data.inquiry_id);
 
     return {

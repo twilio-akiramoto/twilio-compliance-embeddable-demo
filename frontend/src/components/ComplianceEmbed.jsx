@@ -99,7 +99,7 @@ const ComplianceEmbed = ({ inquiryId, inquirySessionToken, onComplete, onError }
           onCancel={handleCancel}
           onError={handleError}
           onEvent={handleEvent}
-          widgetPadding={{ top: 24, bottom: 24, left: 24, right: 24 }}
+          widgetPadding={{ top: 48, bottom: 48, left: 48, right: 48 }}
         />
       </div>
 

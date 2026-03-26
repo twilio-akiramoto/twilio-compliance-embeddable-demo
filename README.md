@@ -191,8 +191,10 @@ To resume:
 
 ```
 POST /api/compliance/tollfree/initialize
-POST /api/compliance/tollfree/resume
+POST /api/compliance/tollfree/resume  (Not currently supported by Twilio API)
 ```
+
+**Note:** Resume functionality is not available for US Toll-free Verification as of Twilio SDK v4.20.0. Verifications must be completed in a single session.
 
 ### Customer Profiles
 
@@ -265,16 +267,16 @@ twilio-compliance-embeddable-demo/
 ### Backend: Initialize ComplianceInquiry
 
 ```javascript
-const response = await client.trusthub.v1.complianceInquiries
-  .tollfree.initialize.create({
-    phoneNumberType: 'tollfree',
-    endUserType: 'Business',
-    isIsvEmbed: true,
-    friendlyName: 'Customer ABC',
-    notificationEmail: 'support@isv.com'
+// US Toll-free Verification
+const response = await client.trusthub.v1.complianceTollfreeInquiries
+  .create({
+    tollfreePhoneNumber: '+18005551234',  // Required: E.164 format
+    notificationEmail: 'support@isv.com', // Required
+    businessName: 'Acme Corporation',     // Optional
+    businessWebsite: 'https://acme.com'   // Optional
   });
 
-// Returns: { inquiryId, inquirySessionToken, registrationId }
+// Returns: { inquiryId, inquirySessionToken, registrationId, url }
 ```
 
 ### Frontend: Render Embed

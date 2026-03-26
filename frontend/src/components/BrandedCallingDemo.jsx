@@ -83,7 +83,7 @@ const BrandedCallingDemo = () => {
 
   if (embedData) {
     return (
-      <div className="demo-page">
+      <div className="demo-page demo-page-fullwidth">
         <div className="page-header">
           <button className="btn btn-secondary" onClick={() => setEmbedData(null)}>
             ← Back to Form

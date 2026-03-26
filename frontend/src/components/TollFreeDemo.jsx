@@ -13,10 +13,10 @@ const TollFreeDemo = () => {
   const [showResume, setShowResume] = useState(false);
 
   // Form state
-  const [friendlyName, setFriendlyName] = useState('');
+  const [tollfreePhoneNumber, setTollfreePhoneNumber] = useState('');
   const [notificationEmail, setNotificationEmail] = useState('');
-  const [phoneNumberType, setPhoneNumberType] = useState('tollfree');
-  const [endUserType, setEndUserType] = useState('Business');
+  const [businessName, setBusinessName] = useState('');
+  const [businessWebsite, setBusinessWebsite] = useState('');
   const [resumeRegistrationId, setResumeRegistrationId] = useState('');
 
   const handleInitialize = async (e) => {
@@ -26,10 +26,10 @@ const TollFreeDemo = () => {
 
     try {
       const response = await initializeTollFree({
-        friendlyName,
+        tollfreePhoneNumber,
         notificationEmail,
-        phoneNumberType,
-        endUserType
+        businessName: businessName || undefined,
+        businessWebsite: businessWebsite || undefined
       });
 
       if (response.success) {
@@ -86,7 +86,7 @@ const TollFreeDemo = () => {
 
   if (embedData) {
     return (
-      <div className="demo-page">
+      <div className="demo-page demo-page-fullwidth">
         <div className="page-header">
           <button className="btn btn-secondary" onClick={() => setEmbedData(null)}>
             ← Back to Form
@@ -152,17 +152,18 @@ const TollFreeDemo = () => {
               <form onSubmit={handleInitialize}>
                 <div className="form-group">
                   <label className="form-label">
-                    Friendly Name <span className="required">*</span>
+                    Toll-free Phone Number <span className="required">*</span>
                   </label>
                   <input
-                    type="text"
+                    type="tel"
                     className="form-input"
-                    value={friendlyName}
-                    onChange={(e) => setFriendlyName(e.target.value)}
-                    placeholder="e.g., Customer ABC - Toll-free"
+                    value={tollfreePhoneNumber}
+                    onChange={(e) => setTollfreePhoneNumber(e.target.value)}
+                    placeholder="e.g., +18005551234"
                     required
+                    pattern="\+1(800|888|877|866|855|844|833)[0-9]{7}"
                   />
-                  <small className="form-help">A descriptive name for this inquiry</small>
+                  <small className="form-help">The toll-free number to verify (E.164 format: +18XXXXXXXXX)</small>
                 </div>
 
                 <div className="form-group">
@@ -177,30 +178,35 @@ const TollFreeDemo = () => {
                     placeholder="e.g., support@yourcompany.com"
                     required
                   />
-                  <small className="form-help">Email to receive status notifications</small>
+                  <small className="form-help">Email to receive verification status notifications</small>
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Phone Number Type</label>
-                  <select
-                    className="form-select"
-                    value={phoneNumberType}
-                    onChange={(e) => setPhoneNumberType(e.target.value)}
-                  >
-                    <option value="tollfree">Toll-free</option>
-                  </select>
+                  <label className="form-label">
+                    Business Name
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    placeholder="e.g., Acme Corporation"
+                  />
+                  <small className="form-help">Name of the business using this toll-free number (optional)</small>
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">End User Type</label>
-                  <select
-                    className="form-select"
-                    value={endUserType}
-                    onChange={(e) => setEndUserType(e.target.value)}
-                  >
-                    <option value="Business">Business</option>
-                    <option value="Individual">Individual</option>
-                  </select>
+                  <label className="form-label">
+                    Business Website
+                  </label>
+                  <input
+                    type="url"
+                    className="form-input"
+                    value={businessWebsite}
+                    onChange={(e) => setBusinessWebsite(e.target.value)}
+                    placeholder="e.g., https://www.example.com"
+                  />
+                  <small className="form-help">Website of the business (optional)</small>
                 </div>
 
                 <button type="submit" className="btn btn-primary" disabled={isLoading}>
@@ -209,6 +215,11 @@ const TollFreeDemo = () => {
               </form>
             ) : (
               <form onSubmit={handleResume}>
+                <div className="alert alert-error">
+                  <strong>⚠️ Resume Not Supported</strong>
+                  <p>Resume functionality is not currently available for US Toll-free Verification. Please complete the verification in a single session or create a new inquiry.</p>
+                </div>
+
                 <div className="form-group">
                   <label className="form-label">
                     Registration ID <span className="required">*</span>
@@ -220,12 +231,13 @@ const TollFreeDemo = () => {
                     onChange={(e) => setResumeRegistrationId(e.target.value)}
                     placeholder="e.g., tri1.us1.account.AC...registration.TF..."
                     required
+                    disabled
                   />
-                  <small className="form-help">The registration ID from a previous inquiry (draft or rejected status)</small>
+                  <small className="form-help">Resume is not supported for toll-free verification</small>
                 </div>
 
-                <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                  {isLoading ? 'Resuming...' : 'Resume Inquiry'}
+                <button type="submit" className="btn btn-primary" disabled>
+                  Resume Not Available
                 </button>
               </form>
             )}
@@ -252,16 +264,15 @@ const TollFreeDemo = () => {
             <pre className="code-block">
               {`// Initialize toll-free inquiry
 const response = await client.trusthub.v1
-  .complianceInquiries.tollfree.initialize
+  .complianceTollfreeInquiries
   .create({
-    phoneNumberType: 'tollfree',
-    endUserType: 'Business',
-    isIsvEmbed: true,
-    friendlyName: 'Customer ABC',
-    notificationEmail: 'support@isv.com'
+    tollfreePhoneNumber: '+18005551234',
+    notificationEmail: 'support@isv.com',
+    businessName: 'Acme Corp',
+    businessWebsite: 'https://example.com'
   });
 
-// Returns: inquiryId, inquirySessionToken`}
+// Returns: inquiryId, inquirySessionToken, registrationId`}
             </pre>
           </div>
         </div>

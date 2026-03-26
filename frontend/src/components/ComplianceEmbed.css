@@ -1,7 +1,7 @@
 .embed-container {
   position: relative;
   width: 100%;
-  min-height: 600px;
+  min-height: 900px;
 }
 
 .loading-overlay {
@@ -23,12 +23,17 @@
 
 .embed-wrapper {
   width: 100%;
-  min-height: 600px;
-  border-radius: 8px;
+  min-height: 900px;
+  border-radius: 12px;
   overflow: hidden;
   background: white;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
   transition: opacity 0.3s ease;
+}
+
+.embed-wrapper iframe {
+  width: 100% !important;
+  min-height: 900px !important;
 }
 
 .embed-loading {
@@ -88,11 +93,15 @@
 /* Responsive */
 @media (max-width: 768px) {
   .embed-container {
-    min-height: 500px;
+    min-height: 700px;
   }
 
   .embed-wrapper {
-    min-height: 500px;
+    min-height: 700px;
+  }
+
+  .embed-wrapper iframe {
+    min-height: 700px !important;
   }
 
   .event-item {

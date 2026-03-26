@@ -1,4 +1,5 @@
-const { client } = require('../config/twilio');
+const axios = require('axios');
+const { accountSid, authToken } = require('../config/twilio');
 
 /**
  * Initialize a new Branded Calling ComplianceInquiry
@@ -37,48 +38,63 @@ async function initializeBrandedCalling(params) {
       throw new Error('Maximum 28 Phone Number SIDs allowed');
     }
 
+    if (shortDisplayName && shortDisplayName.length > 15) {
+      throw new Error('Short display name must be 15 characters or less');
+    }
+
+    if (longDisplayName && longDisplayName.length > 32) {
+      throw new Error('Long display name must be 32 characters or less');
+    }
+
     console.log('📱 Initializing Branded Calling inquiry...');
 
-    // Build request parameters
-    const requestParams = {
-      viSid,
-      pnSids
-    };
+    const url = 'https://trusthub.twilio.com/v1/ComplianceInquiries/BrandedCalling/Initialize';
+
+    // Build request body as URL-encoded form data
+    const formData = new URLSearchParams();
+    formData.append('ViSid', viSid);
+
+    // Add all phone number SIDs
+    pnSids.forEach(pnSid => {
+      formData.append('PnSids', pnSid);
+    });
 
     // Add optional pre-fill parameters
     if (legalBusinessName) {
-      requestParams.legalBusinessName = legalBusinessName;
+      formData.append('LegalBusinessName', legalBusinessName);
     }
     if (shortDisplayName) {
-      if (shortDisplayName.length > 15) {
-        throw new Error('Short display name must be 15 characters or less');
-      }
-      requestParams.shortDisplayName = shortDisplayName;
+      formData.append('ShortDisplayName', shortDisplayName);
     }
     if (longDisplayName) {
-      if (longDisplayName.length > 32) {
-        throw new Error('Long display name must be 32 characters or less');
-      }
-      requestParams.longDisplayName = longDisplayName;
+      formData.append('LongDisplayName', longDisplayName);
     }
     if (purposeOfCall) {
-      requestParams.purposeOfCall = purposeOfCall;
+      formData.append('PurposeOfCall', purposeOfCall);
     }
 
-    const response = await client.trusthub.v1.complianceInquiries.brandedCalling.initialize
-      .create(requestParams);
+    const response = await axios.post(url, formData.toString(), {
+      auth: {
+        username: accountSid,
+        password: authToken
+      },
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      }
+    });
 
-    console.log('✅ Branded Calling inquiry initialized:', response.inquiryId);
+    const data = response.data;
+    console.log('✅ Branded Calling inquiry initialized:', data.inquiry_id);
 
     return {
-      inquiryId: response.inquiryId,
-      inquirySessionToken: response.inquirySessionToken,
-      registrationId: response.registrationId,
-      url: response.url
+      inquiryId: data.inquiry_id,
+      inquirySessionToken: data.inquiry_session_token,
+      registrationId: data.registration_id,
+      url: data.url
     };
   } catch (error) {
-    console.error('❌ Error initializing branded calling:', error.message);
-    throw error;
+    console.error('❌ Error initializing branded calling:', error.response?.data || error.message);
+    throw new Error(error.response?.data?.message || error.message);
   }
 }
 
