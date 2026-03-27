@@ -1,3 +1,10 @@
+Documentation:
+
+https://www.twilio.com/docs/messaging/compliance/toll-free/compliance-embeddable-onboarding
+
+Twilio Internal guide to implement - reach out to your Twilio SE for access.
+https://docs.google.com/document/d/1o_K-1eXUysI_TIiJcmH9k7g_ss1CAwKZvY1oTiJUZVg/edit?tab=t.0#heading=h.z8cazyah9biw
+
 # Twilio ISV Compliance Embeddable Demo
 
 A reference implementation demonstrating how ISVs can integrate the Twilio Compliance Embeddable to streamline customer onboarding across four compliance products.
