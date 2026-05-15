@@ -7,7 +7,11 @@ https://docs.google.com/document/d/1o_K-1eXUysI_TIiJcmH9k7g_ss1CAwKZvY1oTiJUZVg/
 
 # Twilio ISV Compliance Embeddable Demo
 
-A reference implementation demonstrating how ISVs can integrate the Twilio Compliance Embeddable to streamline customer onboarding across four compliance products.
+A complete reference implementation demonstrating how ISVs can integrate the Twilio Compliance Embeddable to streamline customer onboarding. Includes a full customer lifecycle management system with three applications:
+
+- **ISV Demo Dashboard** - Test and explore all compliance products
+- **Customer Portal** - End-customer registration via email invitation
+- **CSM Dashboard** - ISV team monitors customer onboarding progress
 
 ## 🎯 Supported Products
 
@@ -21,19 +25,38 @@ A reference implementation demonstrating how ISVs can integrate the Twilio Compl
 
 ## 🏗️ Architecture
 
-This demo consists of two main components:
+This demo consists of **four applications** in a monorepo structure:
 
-### Backend (Node.js/Express)
-- Initializes ComplianceInquiry sessions via Twilio APIs
-- Returns session tokens and inquiry IDs to frontend
-- Provides endpoints for initialize and resume operations
-- In-memory storage for demo purposes
+### 1. Backend API (Node.js/Express) - Port 3011
+- **Authentication:** JWT-based auth with role-based access control (customer, csm, admin)
+- **Database:** SQLite (dev) with Sequelize ORM - production-ready for PostgreSQL/MySQL
+- **Email Service:** SendGrid integration with graceful fallback to simulation mode
+- **Compliance APIs:** Initializes ComplianceInquiry sessions via Twilio APIs
+- **API Routes:**
+  - `/api/auth/*` - Login, signup, token management
+  - `/api/portal/*` - Customer portal endpoints (protected)
+  - `/api/dashboard/*` - CSM dashboard endpoints (CSM role required)
+  - `/api/compliance/*` - Twilio compliance product APIs
 
-### Frontend (React)
-- Renders the TwilioComplianceEmbed iframe component
-- Handles all embed callbacks (onReady, onInquirySubmitted, onCancel, onError)
-- Product-specific configuration forms
-- Clean, intuitive UI for navigation
+### 2. ISV Demo Dashboard (React) - Port 3010
+- Test and explore all five compliance products
+- Interactive forms for each compliance type
+- Real-time embed integration
+- Developer-focused interface
+
+### 3. Customer Portal (React) - Port 3020
+- **Invitation-based registration:** Customers sign up via secure email link
+- **Dashboard:** View registration status and history
+- **AU Sender ID Registration:** Complete Australia Alphanumeric Sender ID registration
+- **Profile Management:** Update business information
+- Integrates Twilio Compliance Embeddable for end-customers
+
+### 4. CSM Dashboard (React) - Port 3030
+- **Customer Management:** View all customers with search/filter
+- **Send Invitations:** Invite new customers via email
+- **Metrics & Analytics:** Real-time dashboard with charts (recharts)
+- **Customer Timeline:** Track journey from invitation → completed
+- **Status Monitoring:** sent → logged_in → in_progress → completed
 
 ## 📋 Prerequisites
 
@@ -58,6 +81,14 @@ This demo consists of two main components:
 - npm or yarn
 - Git
 
+### Email Configuration (Optional)
+
+For production email delivery:
+- **SendGrid Account:** Get API key at https://sendgrid.com
+- **From Email:** Verified sender email address
+
+Without SendGrid, emails are simulated (logged to console)
+
 ## 🚀 Installation
 
 ### 1. Clone the Repository
@@ -66,18 +97,30 @@ This demo consists of two main components:
 cd /Users/akiramoto/Documents/Github/twilio-compliance-embeddable-demo
 ```
 
-### 2. Install Backend Dependencies
+### 2. Install All Dependencies
 
 ```bash
+# Backend
 cd backend
+npm install
+
+# ISV Demo Dashboard
+cd ../frontend
+npm install
+
+# Customer Portal
+cd ../customer-portal
+npm install
+
+# CSM Dashboard
+cd ../csm-dashboard
 npm install
 ```
 
-### 3. Install Frontend Dependencies
-
+Or install all at once from root (requires concurrently):
 ```bash
-cd ../frontend
 npm install
+npm run install:all
 ```
 
 ### 4. Configure Environment Variables
@@ -92,52 +135,113 @@ cp .env.example .env
 Edit `.env` and add your credentials:
 
 ```env
-PORT=3001
+PORT=3011
 NODE_ENV=development
 
 # Twilio Credentials (REQUIRED)
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=your_auth_token_here
 
-# For Secondary Customer Profiles (OPTIONAL - only if using this product)
+# Australia Alphanumeric Mock Mode (set to 'true' if API not available)
+AU_ALPHANUMERIC_MOCK_MODE=false
+
+# For Secondary Customer Profiles (OPTIONAL)
 PRIMARY_PROFILE_SID=BUxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # CORS Configuration
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://localhost:3010
+CUSTOMER_PORTAL_URL=http://localhost:3020
+CSM_DASHBOARD_URL=http://localhost:3030
+
+# Authentication (REQUIRED for customer portal & dashboard)
+# Generate: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+JWT_SECRET=your-secret-key-change-in-production
+
+# Email Configuration (OPTIONAL - simulates if not set)
+SENDGRID_API_KEY=SG.xxxxxxxxx
+FROM_EMAIL=noreply@yourcompany.com
+
+# Database
+DATABASE_URL=sqlite:./database.sqlite
 ```
 
-#### Frontend Configuration
+#### Frontend Configurations
 
+**ISV Demo Dashboard:**
 ```bash
 cd ../frontend
 cp .env.example .env
 ```
 
-The default values should work:
+```env
+PORT=3010
+REACT_APP_API_URL=http://localhost:3011/api
+REACT_APP_ENABLE_LOGGING=true
+```
+
+**Customer Portal:**
+```bash
+cd ../customer-portal
+cp .env.example .env
+```
 
 ```env
-REACT_APP_API_URL=http://localhost:3001/api
-REACT_APP_ENABLE_LOGGING=true
+PORT=3020
+REACT_APP_API_URL=http://localhost:3011/api
+REACT_APP_APP_NAME=Customer Portal
+```
+
+**CSM Dashboard:**
+```bash
+cd ../csm-dashboard
+cp .env.example .env
+```
+
+```env
+PORT=3030
+REACT_APP_API_URL=http://localhost:3011/api
+REACT_APP_APP_NAME=ISV Dashboard
 ```
 
 ## 🎮 Running the Demo
 
+### Choose Your Experience
+
+**Option A: ISV Demo Dashboard Only** (quick exploration)
+- Test all 5 compliance products
+- Developer-focused interface
+- No authentication required
+
+**Option B: Complete Customer Lifecycle System** (full demo)
+- Customer Portal for end-users
+- CSM Dashboard for ISV team
+- Email invitations and status tracking
+- Production-ready architecture
+
 ### Option 1: Quick Start with Scripts (Recommended)
 
-Use the included management scripts for easy control:
-
+**ISV Demo Dashboard + Backend:**
 ```bash
-# Start both backend and frontend
+# Start backend and ISV demo
 ./start.sh
 
 # Check status
 ./status.sh
 
-# Stop both servers
+# Stop servers
 ./stop.sh
+```
 
-# Restart
-./restart.sh
+**All Applications (Backend + 3 Frontends):**
+```bash
+# Start everything
+./start.sh --all
+
+# Or manually:
+cd backend && npm start &
+cd frontend && PORT=3010 npm start &
+cd customer-portal && PORT=3020 npm start &
+cd csm-dashboard && PORT=3030 npm start &
 ```
 
 **Features:**
@@ -149,156 +253,323 @@ Use the included management scripts for easy control:
 
 See [SCRIPTS_README.md](SCRIPTS_README.md) for detailed documentation.
 
-### Option 2: Run Both Servers Separately
+### Option 2: Run Servers Separately
 
 **Terminal 1 - Backend:**
 ```bash
 cd backend
 npm start
-# or for auto-reload during development:
-npm run dev
+# or for auto-reload: npm run dev
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 2 - ISV Demo Dashboard:**
 ```bash
 cd frontend
-npm start
+PORT=3010 npm start
 ```
 
-### Option 3: Run Both Together (requires root setup)
-
-From the root directory:
-
+**Terminal 3 - Customer Portal (optional):**
 ```bash
-npm install  # installs concurrently
-npm run dev  # runs both backend and frontend
+cd customer-portal
+PORT=3020 npm start
 ```
 
-The application will be available at:
-- **Frontend:** http://localhost:3010
+**Terminal 4 - CSM Dashboard (optional):**
+```bash
+cd csm-dashboard
+PORT=3030 npm start
+```
+
+### Application URLs
+
 - **Backend API:** http://localhost:3011
-- **Health Check:** http://localhost:3011/health
-- **Health Check:** http://localhost:3001/health
+  - Health: http://localhost:3011/health
+  - API Docs: http://localhost:3011/api
+  
+- **ISV Demo Dashboard:** http://localhost:3010
+  - Product selector and testing interface
+  
+- **Customer Portal:** http://localhost:3020
+  - Customer login/registration
+  - Sender ID registration workflow
+  
+- **CSM Dashboard:** http://localhost:3030
+  - CSM login (demo: csm@test.com / password123)
+  - Customer management and metrics
 
 ## 📖 Using the Demo
 
-### 1. Navigate to Landing Page
+### Workflow A: ISV Demo Dashboard (Developer Testing)
 
-Open http://localhost:3000 to see the product selector with four cards.
+1. **Navigate to Landing Page**
+   - Open http://localhost:3010
+   - See product selector with 5 compliance products
 
-### 2. Choose a Product
+2. **Choose a Product**
+   - Click "Start Demo" on any product card
 
-Click "Start Demo" on any product card to begin.
+3. **Initialize an Inquiry**
+   - Fill out form with required information
+   - Click "Initialize Inquiry"
 
-### 3. Initialize an Inquiry
+4. **Complete the Embedded Form**
+   - Twilio Compliance Embeddable loads
+   - Fill out compliance/KYC information
 
-Fill out the form with required information:
-- **Friendly Name:** A descriptive name for tracking
-- **Notification Email:** Where to receive status updates
-- Product-specific fields (varies by product)
+5. **Submit and Track**
+   - Success message appears
+   - Email notifications sent
+   - Inquiry enters review
 
-Click **"Initialize Inquiry"** to create a new compliance session.
+6. **Resume Draft/Rejected** (where supported)
+   - Switch to "Resume" tab
+   - Enter Registration/Customer ID
+   - Click "Resume Inquiry"
 
-### 4. Complete the Embedded Form
+### Workflow B: Customer Lifecycle System (Production Pattern)
 
-The Twilio Compliance Embeddable will load with the compliance form. Your customer would fill this out with their KYC information.
+**Step 1: CSM Sends Invitation**
+1. Login to CSM Dashboard: http://localhost:3030
+   - Email: `csm@test.com`
+   - Password: `password123`
 
-### 5. Submit and Track
+2. Click "Send Invitation"
+   - Enter business name and customer email
+   - Optionally add website
+   - Click "Send Invitation"
 
-After submission:
-- You'll see a success message
-- Email notifications will be sent to the configured address
-- The inquiry enters review status
+3. Copy registration URL from success message
+   - Email is simulated (logged to console)
+   - URL format: `http://localhost:3020/register?token=xxxxx`
 
-### 6. Resume Draft/Rejected Inquiries (Where Supported)
+**Step 2: Customer Registers**
+1. Customer clicks invitation link (or paste URL)
+2. Registration form pre-fills email from invitation
+3. Customer creates account:
+   - Full name
+   - Password (min 8 characters)
+   - Confirm password
+4. Auto-login after registration
 
-Products that support resume functionality:
-- ✅ Toll-free Verification
-- ✅ Customer Profiles
-- ✅ Regulatory Bundles
-- ❌ Branded Calling (must complete in single session)
+**Step 3: Customer Completes Registration**
+1. Customer dashboard shows overview
+2. Click "Register Sender ID"
+3. Fill out AU Alphanumeric form:
+   - Sender ID (2-11 chars, must include letter)
+   - Headquarters country
+   - Use case category
+   - Message volume
+   - Proof type
+4. Click "Start Registration"
+5. Complete Twilio Compliance Embeddable form
+6. Submit → Status updates to "completed"
 
-To resume:
-1. Switch to the "Resume" tab
-2. Enter the Registration/Customer ID from the original inquiry
-3. Click "Resume Inquiry"
+**Step 4: CSM Monitors Progress**
+1. CSM Dashboard shows real-time metrics
+2. Customer list updates status badges:
+   - 🟦 **sent** - Invitation sent
+   - 🟪 **logged_in** - Customer registered
+   - 🟨 **in_progress** - Registration started
+   - 🟢 **completed** - Registration done
+3. Click customer name to view timeline
+4. See all events with timestamps
+
+### Resume Functionality Support
+
+- ✅ **Toll-free Verification** - Resume supported
+- ✅ **Customer Profiles** - Resume supported
+- ✅ **Regulatory Bundles** - Resume supported
+- ✅ **AU Alphanumeric** - Resume supported
+- ❌ **Branded Calling** - Must complete in single session
 
 ## 🔧 API Endpoints
 
-### Toll-free Verification
+### Authentication APIs
 
 ```
-POST /api/compliance/tollfree/initialize
-POST /api/compliance/tollfree/resume  (Not currently supported by Twilio API)
+POST   /api/auth/login                      # Login with email/password
+POST   /api/auth/signup                     # Register with invitation token
+POST   /api/auth/verify-token               # Validate JWT token
+POST   /api/auth/refresh                    # Refresh expired token
+POST   /api/auth/password-reset             # Request password reset
+GET    /api/auth/invitation/:token          # Verify invitation token
 ```
 
-**Note:** Resume functionality is not available for US Toll-free Verification as of Twilio SDK v4.20.0. Verifications must be completed in a single session.
-
-### Customer Profiles
+### Customer Portal APIs (Requires Authentication)
 
 ```
-POST /api/compliance/customer-profile/initialize
-POST /api/compliance/customer-profile/resume
+GET    /api/portal/profile                  # Get customer profile
+PUT    /api/portal/profile                  # Update customer profile
+GET    /api/portal/registrations            # List customer's registrations
+POST   /api/portal/registrations/au-alphanumeric  # Start AU registration
+GET    /api/portal/registrations/:id/status # Check registration status
+PUT    /api/portal/registrations/:id        # Update registration
 ```
 
-### Regulatory Bundles
+### CSM Dashboard APIs (Requires CSM Role)
 
 ```
-POST /api/compliance/regulatory-bundle/initialize
-POST /api/compliance/regulatory-bundle/resume
+GET    /api/dashboard/customers             # List all customers (paginated)
+GET    /api/dashboard/customers/:id         # Get customer details
+POST   /api/dashboard/invitations           # Send invitation
+POST   /api/dashboard/invitations/resend    # Resend invitation
+GET    /api/dashboard/metrics               # Get dashboard metrics
+GET    /api/dashboard/registrations         # List all registrations
+PUT    /api/dashboard/customers/:id/assign  # Assign CSM to customer
+PUT    /api/dashboard/customers/:id/status  # Update customer status
 ```
 
-### Branded Calling
+### Compliance Product APIs
 
 ```
-POST /api/compliance/branded-calling/initialize
-```
+# Toll-free Verification
+POST   /api/compliance/tollfree/initialize
+POST   /api/compliance/tollfree/resume
 
-### Inquiry Management
+# Customer Profiles
+POST   /api/compliance/customer-profile/initialize
+POST   /api/compliance/customer-profile/resume
 
-```
-GET /api/compliance/inquiries
-GET /api/compliance/inquiries/:id
+# Regulatory Bundles
+POST   /api/compliance/regulatory-bundle/initialize
+POST   /api/compliance/regulatory-bundle/resume
+
+# Branded Calling
+POST   /api/compliance/branded-calling/initialize
+
+# Australia Alphanumeric Sender ID
+POST   /api/compliance/au-alphanumeric/initialize
+POST   /api/compliance/au-alphanumeric/resume
+
+# Inquiry Management
+GET    /api/compliance/inquiries
+GET    /api/compliance/inquiries/:id
 ```
 
 ## 🗂️ Project Structure
 
 ```
 twilio-compliance-embeddable-demo/
-├── backend/
+├── backend/                        # Backend API (Port 3011)
 │   ├── config/
 │   │   └── twilio.js              # Twilio client initialization
+│   ├── middleware/
+│   │   └── auth.js                # JWT authentication middleware
+│   ├── models/                    # Database models (Sequelize)
+│   │   ├── index.js               # DB connection & associations
+│   │   ├── user.js                # User model (customer/csm/admin)
+│   │   ├── customer.js            # Customer model (invitations)
+│   │   └── registration.js        # Registration model (sender IDs)
 │   ├── routes/
-│   │   └── compliance.js           # API route handlers
+│   │   ├── auth.js                # Authentication endpoints
+│   │   ├── portal.js              # Customer portal endpoints
+│   │   ├── dashboard.js           # CSM dashboard endpoints
+│   │   └── compliance.js          # Twilio compliance APIs
 │   ├── services/
+│   │   ├── auth.service.js        # JWT & password hashing
+│   │   ├── user.service.js        # User CRUD operations
+│   │   ├── customer.service.js    # Customer management
+│   │   ├── email.service.js       # SendGrid email delivery
 │   │   ├── tollfree.service.js
 │   │   ├── customer-profile.service.js
 │   │   ├── regulatory-bundle.service.js
-│   │   └── branded-calling.service.js
+│   │   ├── branded-calling.service.js
+│   │   └── australia-alphanumeric.service.js
 │   ├── utils/
-│   │   └── storage.js              # In-memory inquiry storage
-│   ├── server.js                   # Express server
+│   │   └── storage.js             # Legacy in-memory storage
+│   ├── server.js                  # Express server
 │   ├── package.json
 │   └── .env.example
 │
-└── frontend/
+├── frontend/                       # ISV Demo Dashboard (Port 3010)
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ProductSelector.jsx
+│   │   │   ├── ComplianceEmbed.jsx
+│   │   │   ├── TollFreeDemo.jsx
+│   │   │   ├── CustomerProfileDemo.jsx
+│   │   │   ├── RegulatoryBundleDemo.jsx
+│   │   │   ├── BrandedCallingDemo.jsx
+│   │   │   └── AustraliaAlphanumericDemo.jsx
+│   │   ├── services/
+│   │   │   └── api.js
+│   │   ├── utils/
+│   │   │   └── constants.js
+│   │   ├── App.js
+│   │   └── index.js
+│   ├── package.json
+│   └── .env.example
+│
+├── customer-portal/                # Customer Portal (Port 3020)
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ProtectedRoute.jsx     # Auth guard
+│   │   │   └── ComplianceEmbed.jsx
+│   │   ├── pages/
+│   │   │   ├── Login.jsx              # Customer login
+│   │   │   ├── Register.jsx           # Invitation-based signup
+│   │   │   ├── Dashboard.jsx          # Customer dashboard
+│   │   │   └── RegisterSender.jsx     # AU sender registration
+│   │   ├── hooks/
+│   │   │   └── useAuth.js             # Auth context
+│   │   ├── services/
+│   │   │   ├── auth.js                # Auth API calls
+│   │   │   └── portal.js              # Portal API calls
+│   │   ├── styles/                    # CSS files
+│   │   ├── App.jsx                    # Router config
+│   │   └── index.js
+│   ├── package.json
+│   └── .env.example
+│
+└── csm-dashboard/                  # CSM Dashboard (Port 3030)
     ├── src/
     │   ├── components/
-    │   │   ├── ProductSelector.jsx
-    │   │   ├── ComplianceEmbed.jsx    # Reusable embed wrapper
-    │   │   ├── TollFreeDemo.jsx
-    │   │   ├── CustomerProfileDemo.jsx
-    │   │   ├── RegulatoryBundleDemo.jsx
-    │   │   └── BrandedCallingDemo.jsx
+    │   │   ├── ProtectedRoute.jsx     # Auth guard
+    │   │   ├── StatusBadge.jsx        # Status badge component
+    │   │   └── MetricCard.jsx         # Metric display
+    │   ├── pages/
+    │   │   ├── Login.jsx              # CSM login
+    │   │   ├── Dashboard.jsx          # Metrics & charts
+    │   │   ├── CustomerList.jsx       # Customer table
+    │   │   ├── CustomerDetail.jsx     # Customer timeline
+    │   │   └── SendInvitation.jsx     # Invite form
+    │   ├── hooks/
+    │   │   └── useAuth.js             # Auth context
     │   ├── services/
-    │   │   └── api.js                 # Axios API client
-    │   ├── utils/
-    │   │   └── constants.js
-    │   ├── App.js                     # Main app with routing
+    │   │   ├── auth.js                # Auth API calls
+    │   │   └── dashboard.js           # Dashboard API calls
+    │   ├── styles/                    # CSS files
+    │   ├── App.js                     # Router config
     │   └── index.js
     ├── package.json
     └── .env.example
 ```
+
+## 💾 Database Schema
+
+The system uses SQLite for development (easily swappable to PostgreSQL/MySQL for production).
+
+### Tables
+
+**users**
+- Authentication and role management
+- Fields: id, email, passwordHash, username, role (customer/csm/admin), companyName, lastLogin, isActive
+- Supports JWT-based authentication
+
+**customers**
+- Customer invitation and onboarding tracking
+- Fields: id, userId (FK), businessName, contactEmail, invitationToken, invitationSentAt, invitationStatus, assignedCSM (FK), metadata
+- Status flow: sent → opened → logged_in → in_progress → completed
+
+**registrations**
+- Sender ID registrations for compliance products
+- Fields: id, customerId (FK), registrationType, senderId, status, twilioRegistrationId, twilioInquiryId, startedAt, completedAt, data (JSON)
+- Tracks multiple registrations per customer
+
+### Relationships
+- User → Customer (one-to-one via userId)
+- User (CSM) → Customers (one-to-many via assignedCSM)
+- Customer → Registrations (one-to-many)
 
 ## 🎨 Key Integration Points
 
@@ -425,26 +696,55 @@ Some countries may not yet be supported.
 1. **Never expose Twilio credentials to frontend**
    - Keep Account SID and Auth Token server-side only
    - Session tokens are ephemeral and safe to pass to frontend
+   - ✅ Already implemented in this demo
 
-2. **Implement authentication**
-   - Add user authentication before allowing inquiry initialization
-   - Verify user permissions for each operation
+2. **JWT Secret Management**
+   - Generate strong JWT_SECRET using: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+   - Never commit JWT_SECRET to version control
+   - Use environment-specific secrets in production
+   - ✅ JWT authentication already implemented
 
-3. **Use HTTPS in production**
+3. **Password Security**
+   - Passwords hashed with bcrypt (10 salt rounds)
+   - Minimum 8 character requirement enforced
+   - ✅ Already implemented
+
+4. **Email Security**
+   - Invitation tokens are cryptographically secure (32 bytes)
+   - Tokens are single-use and invalidated after registration
+   - SendGrid API key kept server-side only
+   - ✅ Already implemented with graceful fallback
+
+5. **Use HTTPS in production**
    - Configure SSL/TLS certificates
-   - Update CORS settings for production domain
+   - Update CORS settings for production domains
+   - Set secure cookie flags in production
 
-4. **Validate webhook signatures**
+6. **Database Security**
+   - SQLite suitable for development/demo only
+   - Migrate to PostgreSQL/MySQL for production
+   - Enable connection encryption
+   - Implement backup and retention policies
+
+7. **Role-Based Access Control**
+   - Customer role: can only access own data
+   - CSM role: can view all customers and send invitations
+   - Admin role: full system access
+   - ✅ RBAC middleware already implemented
+
+8. **Rate Limiting**
+   - Add rate limiting to API endpoints
+   - Prevent brute force attacks on login
+   - Throttle invitation sending
+
+9. **Validate webhook signatures**
    - When implementing status callbacks, validate Twilio's signature
    - See: https://www.twilio.com/docs/usage/webhooks/webhooks-security
 
-5. **Replace in-memory storage**
-   - Use a proper database (PostgreSQL, MongoDB, etc.)
-   - Implement data retention policies
-
-6. **Rate limiting**
-   - Add rate limiting to API endpoints
-   - Prevent abuse and excessive API calls
+10. **Input Validation**
+    - Validate all user inputs server-side
+    - Sanitize data before database insertion
+    - ✅ Basic validation implemented
 
 ## 🚢 Deployment
 
