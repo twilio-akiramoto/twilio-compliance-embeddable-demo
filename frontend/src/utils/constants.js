@@ -3,7 +3,8 @@ export const PRODUCTS = {
   TOLLFREE: 'tollfree',
   CUSTOMER_PROFILE: 'customer-profile',
   REGULATORY_BUNDLE: 'regulatory-bundle',
-  BRANDED_CALLING: 'branded-calling'
+  BRANDED_CALLING: 'branded-calling',
+  AU_ALPHANUMERIC: 'au-alphanumeric'
 };
 
 // Phone Number Types for Toll-free and RC Bundles
@@ -92,3 +93,25 @@ export const STATUS_COLORS = {
   [INQUIRY_STATUS.APPROVED]: '#00CC66',
   [INQUIRY_STATUS.REJECTED]: '#FF3333'
 };
+
+// Australia Alphanumeric Sender ID specific constants
+export const AU_SENDER_ID_PROOF_TYPES = [
+  { value: 'Company Extract', label: 'Company Extract' },
+  { value: 'Australian Business Names Register', label: 'Australian Business Names Register (ABNR)' },
+  { value: '.au Domain', label: '.au Domain' },
+  { value: 'Australian Trademark', label: 'Australian Trademark' },
+  { value: 'International Trademark', label: 'International Trademark' },
+  { value: 'Other', label: 'Other' }
+];
+
+export const AU_USE_CASE_CATEGORIES = [
+  { value: 'PROMOTIONAL', label: 'Promotional' },
+  { value: 'TRANSACTIONAL', label: 'Transactional' }
+];
+
+export const AU_MESSAGE_VOLUMES = [
+  { value: '1-1000', label: '1 - 1,000' },
+  { value: '1000-10000', label: '1,000 - 10,000' },
+  { value: '10000-100000', label: '10,000 - 100,000' },
+  { value: '100000+', label: '100,000+' }
+];

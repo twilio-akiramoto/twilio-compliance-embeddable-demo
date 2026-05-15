@@ -7,6 +7,7 @@ const { initializeTollFree, resumeTollFree } = require('../services/tollfree.ser
 const { initializeCustomerProfile, resumeCustomerProfile } = require('../services/customer-profile.service');
 const { initializeRegulatoryBundle, resumeRegulatoryBundle } = require('../services/regulatory-bundle.service');
 const { initializeBrandedCalling } = require('../services/branded-calling.service');
+const { initializeAustraliaAlphanumeric, resumeAustraliaAlphanumeric } = require('../services/australia-alphanumeric.service');
 
 /**
  * Helper function to format success responses
@@ -318,6 +319,109 @@ router.post('/branded-calling/initialize', async (req, res) => {
       status: 'initialized',
       viSid,
       phoneNumberCount: pnSids.length
+    });
+
+    res.json(successResponse(result));
+  } catch (error) {
+    res.status(500).json(errorResponse(error));
+  }
+});
+
+// ========================================
+// Australia Alphanumeric Sender ID Endpoints
+// ========================================
+
+/**
+ * POST /api/compliance/au-alphanumeric/initialize
+ * Initialize a new Australia Alphanumeric Sender ID registration
+ */
+router.post('/au-alphanumeric/initialize', async (req, res) => {
+  try {
+    const {
+      friendlyName,
+      notificationEmail,
+      senderId,
+      headquartersCountry,
+      proofOfSenderId,
+      businessName,
+      businessWebsite,
+      useCaseCategory,
+      messageVolume,
+      statusCallbackUrl
+    } = req.body;
+
+    // Validation
+    if (!friendlyName || !notificationEmail || !senderId) {
+      return res.status(400).json(errorResponse(
+        new Error('friendlyName, notificationEmail, and senderId are required')
+      ));
+    }
+
+    // Validate sender ID format (2-11 alphanumeric characters, must contain at least one letter)
+    if (!/^[a-zA-Z0-9]{2,11}$/.test(senderId)) {
+      return res.status(400).json(errorResponse(
+        new Error('senderId must be 2-11 alphanumeric characters')
+      ));
+    }
+
+    if (!/[a-zA-Z]/.test(senderId)) {
+      return res.status(400).json(errorResponse(
+        new Error('senderId must contain at least one letter')
+      ));
+    }
+
+    const result = await initializeAustraliaAlphanumeric({
+      friendlyName,
+      notificationEmail,
+      senderId,
+      headquartersCountry,
+      proofOfSenderId,
+      businessName,
+      businessWebsite,
+      useCaseCategory,
+      messageVolume,
+      statusCallbackUrl
+    });
+
+    // Store inquiry
+    storage.saveInquiry({
+      inquiryId: result.inquiryId,
+      product: 'au-alphanumeric',
+      registrationId: result.registrationId,
+      status: result.status || 'initialized',
+      senderId,
+      friendlyName,
+      businessName
+    });
+
+    res.json(successResponse(result));
+  } catch (error) {
+    res.status(500).json(errorResponse(error));
+  }
+});
+
+/**
+ * POST /api/compliance/au-alphanumeric/resume
+ * Resume an existing Australia Alphanumeric Sender ID registration
+ */
+router.post('/au-alphanumeric/resume', async (req, res) => {
+  try {
+    const { registrationId } = req.body;
+
+    if (!registrationId) {
+      return res.status(400).json(errorResponse(
+        new Error('registrationId is required')
+      ));
+    }
+
+    const result = await resumeAustraliaAlphanumeric(registrationId);
+
+    // Update stored inquiry
+    storage.saveInquiry({
+      inquiryId: result.inquiryId,
+      product: 'au-alphanumeric',
+      registrationId: result.registrationId,
+      status: 'resumed'
     });
 
     res.json(successResponse(result));

@@ -86,6 +86,20 @@ export const initializeBrandedCalling = async (data) => {
 };
 
 // ========================================
+// Australia Alphanumeric Sender ID APIs
+// ========================================
+
+export const initializeAustraliaAlphanumeric = async (data) => {
+  const response = await apiClient.post('/compliance/au-alphanumeric/initialize', data);
+  return response.data;
+};
+
+export const resumeAustraliaAlphanumeric = async (registrationId) => {
+  const response = await apiClient.post('/compliance/au-alphanumeric/resume', { registrationId });
+  return response.data;
+};
+
+// ========================================
 // Inquiry Management APIs
 // ========================================
 
@@ -107,6 +121,8 @@ export default {
   initializeRegulatoryBundle,
   resumeRegulatoryBundle,
   initializeBrandedCalling,
+  initializeAustraliaAlphanumeric,
+  resumeAustraliaAlphanumeric,
   getInquiries,
   getInquiry
 };

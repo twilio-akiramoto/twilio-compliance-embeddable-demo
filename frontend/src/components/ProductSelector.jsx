@@ -41,6 +41,15 @@ const ProductSelector = () => {
       status: 'Pilot',
       route: '/branded-calling',
       docsUrl: 'https://www.twilio.com/docs/messaging/compliance/toll-free/compliance-embeddable-onboarding'
+    },
+    {
+      id: 'au-alphanumeric',
+      icon: '🇦🇺',
+      title: 'Australia Alphanumeric Sender ID',
+      description: 'Register alphanumeric sender IDs for Australian SMS messaging. Required for compliance with ACMA regulations by July 1, 2026.',
+      status: 'Pilot',
+      route: '/au-alphanumeric',
+      docsUrl: 'https://www.twilio.com/docs/messaging/compliance/sender-id-registration'
     }
   ];
 

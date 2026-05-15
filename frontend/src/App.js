@@ -8,6 +8,7 @@ import TollFreeDemo from './components/TollFreeDemo';
 import CustomerProfileDemo from './components/CustomerProfileDemo';
 import RegulatoryBundleDemo from './components/RegulatoryBundleDemo';
 import BrandedCallingDemo from './components/BrandedCallingDemo';
+import AustraliaAlphanumericDemo from './components/AustraliaAlphanumericDemo';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/customer-profile" element={<CustomerProfileDemo />} />
             <Route path="/regulatory-bundle" element={<RegulatoryBundleDemo />} />
             <Route path="/branded-calling" element={<BrandedCallingDemo />} />
+            <Route path="/au-alphanumeric" element={<AustraliaAlphanumericDemo />} />
           </Routes>
         </main>
 

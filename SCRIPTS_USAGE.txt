@@ -1,0 +1,217 @@
+═══════════════════════════════════════════════════════════
+    TWILIO COMPLIANCE DEMO - MANAGEMENT SCRIPTS
+═══════════════════════════════════════════════════════════
+
+QUICK REFERENCE GUIDE
+─────────────────────────────────────────────────────────
+
+START THE DEMO
+──────────────
+  Command:    ./start.sh
+  
+  What it does:
+  • Checks for existing processes
+  • Installs dependencies (if needed)
+  • Starts backend on port 3011
+  • Starts frontend on port 3010
+  • Validates health endpoints
+  • Opens browser (macOS)
+  • Creates PID files
+  
+  Expected output:
+    ✅ Backend started (PID: xxxxx)
+    ✅ Frontend started (PID: xxxxx)
+    🎉 Demo Started Successfully!
+  
+  URLs:
+    Frontend:  http://localhost:3010
+    Backend:   http://localhost:3011
+  
+─────────────────────────────────────────────────────────
+
+STOP THE DEMO
+─────────────
+  Command:    ./stop.sh
+  
+  What it does:
+  • Gracefully stops backend
+  • Gracefully stops frontend
+  • Force kills if needed
+  • Cleans up PID files
+  • Frees ports 3010 and 3011
+  
+  Expected output:
+    ✅ Backend stopped
+    ✅ Frontend stopped
+    ✅ Demo Stopped Successfully!
+
+─────────────────────────────────────────────────────────
+
+CHECK STATUS
+────────────
+  Command:    ./status.sh
+  
+  What it shows:
+  • Running/stopped status
+  • Process IDs (PIDs)
+  • Health check results
+  • CPU and memory usage
+  • Mock mode status
+  • Port occupancy
+  
+  Exit codes:
+    0 = All services running
+    1 = Some services running
+    2 = No services running
+  
+─────────────────────────────────────────────────────────
+
+RESTART
+───────
+  Command:    ./restart.sh
+  
+  What it does:
+  • Stops all servers
+  • Waits 2 seconds
+  • Starts all servers
+  
+  Same as:    ./stop.sh && ./start.sh
+
+─────────────────────────────────────────────────────────
+
+VIEW LOGS
+─────────
+  Backend logs:
+    tail -f logs/backend.log
+  
+  Frontend logs:
+    tail -f logs/frontend.log
+  
+  Both logs:
+    tail -f logs/*.log
+
+─────────────────────────────────────────────────────────
+
+TROUBLESHOOTING
+───────────────
+
+Problem: Port already in use
+Solution: ./stop.sh
+
+Problem: Servers won't start
+Solution: Check logs/backend.log and logs/frontend.log
+
+Problem: Network error in browser
+Solution: Verify backend is running with ./status.sh
+
+Problem: Stale PID files
+Solution: rm -f logs/*.pid && ./start.sh
+
+─────────────────────────────────────────────────────────
+
+WORKFLOW EXAMPLES
+─────────────────
+
+First time setup:
+  1. Edit backend/.env (add credentials)
+  2. ./start.sh
+  3. Open http://localhost:3010
+
+Daily usage:
+  ./start.sh      # Morning: start work
+  ./status.sh     # Check if running
+  ./stop.sh       # Evening: end work
+
+After changing config:
+  ./restart.sh
+
+Before deploying:
+  ./stop.sh       # Clean slate
+  ./start.sh      # Fresh start
+  ./status.sh     # Verify
+
+─────────────────────────────────────────────────────────
+
+FILE LOCATIONS
+──────────────
+
+Scripts:
+  ./start.sh      - Start script
+  ./stop.sh       - Stop script
+  ./status.sh     - Status script
+  ./restart.sh    - Restart script
+
+Logs:
+  logs/backend.log    - Backend output
+  logs/frontend.log   - Frontend output
+  logs/backend.pid    - Backend process ID
+  logs/frontend.pid   - Frontend process ID
+
+Config:
+  backend/.env        - Backend environment
+  frontend/.env       - Frontend environment
+
+Docs:
+  SCRIPTS_README.md       - Full documentation
+  GETTING_STARTED.md      - Setup guide
+  AU_ALPHANUMERIC_README.md - AU Sender ID
+  QUICK_TEST.md           - Testing guide
+
+─────────────────────────────────────────────────────────
+
+HELPFUL COMMANDS
+────────────────
+
+Check backend health:
+  curl http://localhost:3011/health
+
+Check frontend:
+  curl http://localhost:3010
+
+List all inquiries:
+  curl http://localhost:3011/api/compliance/inquiries
+
+Kill port manually:
+  lsof -ti:3011 | xargs kill -9
+
+Check running processes:
+  ps aux | grep node
+
+─────────────────────────────────────────────────────────
+
+QUICK TIPS
+──────────
+
+✓ Always use ./start.sh instead of manual npm start
+✓ Check ./status.sh if something seems wrong
+✓ Logs are your friend - tail -f logs/*.log
+✓ ./restart.sh after changing .env files
+✓ ./stop.sh before git operations
+✓ Keep logs/ directory for debugging
+
+─────────────────────────────────────────────────────────
+
+MORE HELP
+─────────
+
+Read detailed docs:
+  • SCRIPTS_README.md - Full script reference
+  • GETTING_STARTED.md - Setup walkthrough
+  
+Ask for help:
+  • GitHub Issues
+  • Twilio Support
+  • Check backend logs
+
+═══════════════════════════════════════════════════════════
+
+COPY THIS FOR YOUR BASH PROFILE:
+
+  alias demo-start='cd /path/to/demo && ./start.sh'
+  alias demo-stop='cd /path/to/demo && ./stop.sh'
+  alias demo-status='cd /path/to/demo && ./status.sh'
+  alias demo-logs='cd /path/to/demo && tail -f logs/*.log'
+
+Then use anywhere: demo-start, demo-status, demo-stop
+
+═══════════════════════════════════════════════════════════

@@ -15,6 +15,9 @@ A reference implementation demonstrating how ISVs can integrate the Twilio Compl
 - **Secondary Customer Profiles** - Create customer profiles for voice products
 - **Regulatory Compliance Bundles** - Register phone numbers for 30+ international markets
 - **Branded Calling** (Pilot) - Display business branding on outgoing calls
+- **Australia Alphanumeric Sender ID** (NEW) - Register alphanumeric sender IDs for Australian SMS compliance (ACMA regulations)
+
+> **Note:** Australia Alphanumeric Sender ID is in pilot and includes a mock mode for testing. See [AU_ALPHANUMERIC_README.md](AU_ALPHANUMERIC_README.md) for setup instructions.
 
 ## 🏗️ Architecture
 
@@ -119,7 +122,34 @@ REACT_APP_ENABLE_LOGGING=true
 
 ## 🎮 Running the Demo
 
-### Option 1: Run Both Servers Separately
+### Option 1: Quick Start with Scripts (Recommended)
+
+Use the included management scripts for easy control:
+
+```bash
+# Start both backend and frontend
+./start.sh
+
+# Check status
+./status.sh
+
+# Stop both servers
+./stop.sh
+
+# Restart
+./restart.sh
+```
+
+**Features:**
+- ✅ Automatic dependency installation
+- ✅ Health checks and validation
+- ✅ Background process management
+- ✅ Detailed logs in `logs/` directory
+- ✅ Auto-opens browser (macOS)
+
+See [SCRIPTS_README.md](SCRIPTS_README.md) for detailed documentation.
+
+### Option 2: Run Both Servers Separately
 
 **Terminal 1 - Backend:**
 ```bash
@@ -135,7 +165,7 @@ cd frontend
 npm start
 ```
 
-### Option 2: Run Both Together (requires root setup)
+### Option 3: Run Both Together (requires root setup)
 
 From the root directory:
 
@@ -145,8 +175,9 @@ npm run dev  # runs both backend and frontend
 ```
 
 The application will be available at:
-- **Frontend:** http://localhost:3000
-- **Backend API:** http://localhost:3001
+- **Frontend:** http://localhost:3010
+- **Backend API:** http://localhost:3011
+- **Health Check:** http://localhost:3011/health
 - **Health Check:** http://localhost:3001/health
 
 ## 📖 Using the Demo
