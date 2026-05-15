@@ -1,0 +1,251 @@
+.dashboard-layout {
+  min-height: 100vh;
+  background: #f5f7fa;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-header {
+  background: white;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-left h1 {
+  margin: 0 0 0.25rem 0;
+  color: #333;
+  font-size: 1.75rem;
+}
+
+.header-left p {
+  margin: 0;
+  color: #666;
+}
+
+.header-nav {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.nav-link {
+  background: transparent;
+  border: none;
+  padding: 0.625rem 1rem;
+  color: #666;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.nav-link:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.nav-link.active {
+  background: #667eea;
+  color: white;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+  padding: 0.625rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
+
+.dashboard-content {
+  flex: 1;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.metrics-section h2 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.metric-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.metric-card-blue { border-left: 4px solid #2196f3; }
+.metric-card-purple { border-left: 4px solid #9c27b0; }
+.metric-card-yellow { border-left: 4px solid #ff9800; }
+.metric-card-green { border-left: 4px solid #4caf50; }
+
+.metric-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.metric-content {
+  flex: 1;
+}
+
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.metric-title {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.metric-change {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.metric-change.positive { color: #4caf50; }
+.metric-change.negative { color: #f44336; }
+
+.charts-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.chart-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.chart-card h3 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+}
+
+.empty-chart {
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.stat-label {
+  font-weight: 600;
+  color: #666;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.actions-section {
+  margin-bottom: 2rem;
+}
+
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.action-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+
+.action-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.action-card h3 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.action-card p {
+  color: #666;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.35rem 0.85rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge-small {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+}
+
+.badge-gray { background: #e0e0e0; color: #666; }
+.badge-blue { background: #e3f2fd; color: #1976d2; }
+.badge-purple { background: #f3e5f5; color: #7b1fa2; }
+.badge-yellow { background: #fff3e0; color: #e65100; }
+.badge-green { background: #e8f5e9; color: #2e7d32; }
+.badge-red { background: #ffebee; color: #c62828; }

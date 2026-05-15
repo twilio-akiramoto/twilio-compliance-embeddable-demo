@@ -1,0 +1,206 @@
+.dashboard-container {
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.dashboard-header {
+  background: white;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dashboard-header h1 {
+  margin: 0 0 0.25rem 0;
+  color: #333;
+  font-size: 1.75rem;
+}
+
+.dashboard-header p {
+  margin: 0;
+  color: #666;
+}
+
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.metric-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.metric-value {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #0263e0;
+  margin-bottom: 0.25rem;
+}
+
+.metric-label {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.action-section {
+  background: linear-gradient(135deg, #0263e0 0%, #0056b3 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.action-section h2 {
+  margin: 0 0 0.5rem 0;
+}
+
+.action-section p {
+  margin: 0 0 1.5rem 0;
+  opacity: 0.9;
+}
+
+.action-section .btn-primary {
+  background: white;
+  color: #0263e0;
+}
+
+.action-section .btn-primary:hover {
+  background: #f5f5f5;
+}
+
+.registrations-section,
+.profile-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+}
+
+.registrations-section h2,
+.profile-section h2 {
+  margin: 0 0 1.5rem 0;
+  color: #333;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}
+
+.registrations-table {
+  overflow-x: auto;
+}
+
+.registrations-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.registrations-table th,
+.registrations-table td {
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.registrations-table th {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.registrations-table td {
+  color: #333;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.badge-gray {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.badge-blue {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.badge-yellow {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.badge-green {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.badge-red {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+.info-row .label {
+  font-weight: 600;
+  color: #666;
+}
+
+.info-row .value {
+  color: #333;
+}
+
+.btn-secondary {
+  background: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #5a6268;
+}
