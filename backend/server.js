@@ -73,6 +73,12 @@ async function startServer() {
     await sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
     console.log('✅ Database models synchronized');
 
+    // Seed test data if in development mode
+    if (process.env.NODE_ENV === 'development') {
+      const seed = require('./scripts/seed');
+      await seed();
+    }
+
     // Start server
     app.listen(PORT, () => {
       console.log('='.repeat(50));
