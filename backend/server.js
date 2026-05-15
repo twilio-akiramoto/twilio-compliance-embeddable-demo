@@ -70,7 +70,9 @@ async function startServer() {
     console.log('✅ Database connection established');
 
     // Sync database models (create tables if they don't exist)
-    await sequelize.sync({ alter: process.env.NODE_ENV === 'development' });
+    // Use force: false to prevent dropping existing tables
+    // alter mode can cause issues with existing data
+    await sequelize.sync({ force: false });
     console.log('✅ Database models synchronized');
 
     // Seed test data if in development mode

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { getMetrics } from '../services/dashboard';
+import { getMetrics, resetDatabase } from '../services/dashboard';
 import MetricCard from '../components/MetricCard';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import '../styles/Dashboard.css';
@@ -9,6 +9,7 @@ import '../styles/Dashboard.css';
 export default function Dashboard() {
   const [metrics, setMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [resetting, setResetting] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -30,6 +31,26 @@ export default function Dashboard() {
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleReset = async () => {
+    if (!window.confirm('⚠️ Are you sure you want to reset the demo?\n\nThis will:\n- Delete all customers and registrations\n- Reset to test users (csm@test.com, customer@test.com)\n- Clear all demo data\n\nThis action cannot be undone.')) {
+      return;
+    }
+
+    setResetting(true);
+    try {
+      await resetDatabase();
+      alert('✅ Demo reset successfully!\n\nTest users recreated:\n- CSM: csm@test.com / password123\n- Customer: customer@test.com / customer123');
+
+      // Reload metrics
+      await loadMetrics();
+    } catch (error) {
+      console.error('Failed to reset database:', error);
+      alert('❌ Failed to reset demo: ' + (error.message || 'Unknown error'));
+    } finally {
+      setResetting(false);
+    }
   };
 
   if (loading) {
@@ -70,6 +91,14 @@ export default function Dashboard() {
           </button>
           <button onClick={() => navigate('/invitations')} className="nav-link">
             Send Invitation
+          </button>
+          <button
+            onClick={handleReset}
+            className="btn btn-warning"
+            disabled={resetting}
+            title="Reset demo database and restore test users"
+          >
+            {resetting ? 'Resetting...' : '🔄 Reset Demo'}
           </button>
           <button onClick={handleLogout} className="btn btn-secondary">
             Logout

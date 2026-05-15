@@ -444,4 +444,38 @@ router.put('/customers/:id/status', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/dashboard/reset
+ * Reset the demo database (delete all data and reseed)
+ */
+router.post('/reset', async (req, res) => {
+  try {
+    const { sequelize } = require('../models');
+    const seed = require('../scripts/seed');
+
+    // Delete all data from tables
+    await Registration.destroy({ where: {}, truncate: true });
+    await Customer.destroy({ where: {}, truncate: true });
+    await User.destroy({ where: {}, truncate: true });
+
+    console.log('✅ All data cleared');
+
+    // Reseed the database
+    await seed();
+
+    console.log('✅ Database reseeded');
+
+    res.json({
+      success: true,
+      message: 'Database reset successfully. Test users recreated.'
+    });
+  } catch (error) {
+    console.error('Reset database error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to reset database'
+    });
+  }
+});
+
 module.exports = router;

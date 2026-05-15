@@ -230,6 +230,13 @@ REACT_APP_APP_NAME=ISV Dashboard
 
 # Stop servers
 ./stop.sh
+
+# Reset demo database and clean logs
+./reset-db.sh
+
+# Reset and auto-restart
+./reset-db.sh --restart
+./reset-db.sh --restart --all
 ```
 
 **All Applications (Backend + 3 Frontends):**
@@ -603,6 +610,58 @@ import { TwilioComplianceEmbed } from '@twilio/twilio-compliance-embed';
 />
 ```
 
+## 🔄 Resetting the Demo
+
+The demo includes multiple ways to reset and clean the database:
+
+### Method 1: Reset Script (Recommended)
+
+```bash
+# Clean database and logs only
+./reset-db.sh
+
+# Clean and auto-restart ISV demo
+./reset-db.sh --restart
+
+# Clean and auto-restart all applications
+./reset-db.sh --restart --all
+```
+
+**What it does:**
+- Stops all running services
+- Deletes the SQLite database file
+- Cleans all log files
+- Optionally restarts with fresh seed data
+
+**Test credentials are recreated:**
+- CSM: `csm@test.com` / `password123`
+- Customer: `customer@test.com` / `customer123`
+
+### Method 2: UI Button (CSM Dashboard)
+
+1. Log into CSM Dashboard: http://localhost:3030
+2. Click "🔄 Reset Demo" button in header
+3. Confirm the action
+4. Database is cleared and reseeded without restarting servers
+
+**Note:** This method keeps the servers running and only resets the data.
+
+### Method 3: Manual Cleanup
+
+```bash
+# Stop services
+./stop.sh
+
+# Remove database
+rm -f backend/database.sqlite
+
+# Remove logs
+rm -f logs/*.log
+
+# Restart
+./start.sh --all
+```
+
 ## 🐛 Troubleshooting
 
 ### Backend won't start
@@ -626,6 +685,16 @@ cp .env.example .env
 ```env
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=your_auth_token_here
+```
+
+---
+
+**Error:** `SQLITE_CONSTRAINT: UNIQUE constraint failed`
+
+**Solution:** Database migration conflict. Reset the database:
+
+```bash
+./reset-db.sh --restart --all
 ```
 
 ### Frontend build errors

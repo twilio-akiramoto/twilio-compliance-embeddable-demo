@@ -87,3 +87,12 @@ export async function updateCustomerStatus(customerId, status) {
   const response = await apiClient.put(`/dashboard/customers/${customerId}/status`, { status });
   return response.data.data.customer;
 }
+
+/**
+ * Reset the demo database
+ * @returns {Promise<Object>}
+ */
+export async function resetDatabase() {
+  const response = await apiClient.post('/dashboard/reset');
+  return response.data;
+}

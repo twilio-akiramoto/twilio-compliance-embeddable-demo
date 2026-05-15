@@ -143,7 +143,14 @@ for i in {1..30}; do
     # Check if backend process died
     if ! ps -p $BACKEND_PID > /dev/null 2>&1; then
         echo -e "${RED}   ❌ Backend failed to start${NC}"
-        echo -e "${RED}   Check logs: tail -f $BACKEND_LOG${NC}"
+
+        # Check if it's a database issue
+        if grep -q "SQLITE_CONSTRAINT" "$BACKEND_LOG" 2>/dev/null; then
+            echo -e "${YELLOW}   ⚠️  Database migration conflict detected${NC}"
+            echo -e "${YELLOW}   💡 Fix: Run './stop.sh && rm -f backend/database.sqlite && ./start.sh $@'${NC}"
+        else
+            echo -e "${RED}   Check logs: tail -f $BACKEND_LOG${NC}"
+        fi
         exit 1
     fi
 

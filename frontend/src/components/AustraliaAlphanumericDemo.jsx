@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import ComplianceEmbed from './ComplianceEmbed';
 import { initializeAustraliaAlphanumeric, resumeAustraliaAlphanumeric } from '../services/api';
 import { AU_SENDER_ID_PROOF_TYPES, AU_USE_CASE_CATEGORIES, AU_MESSAGE_VOLUMES, COUNTRIES } from '../utils/constants';
@@ -7,6 +7,7 @@ import './DemoPages.css';
 
 const AustraliaAlphanumericDemo = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [embedData, setEmbedData] = useState(null);
@@ -23,6 +24,39 @@ const AustraliaAlphanumericDemo = () => {
   const [useCaseCategory, setUseCaseCategory] = useState('PROMOTIONAL');
   const [messageVolume, setMessageVolume] = useState('');
   const [resumeRegistrationId, setResumeRegistrationId] = useState('');
+
+  // Check URL parameters on mount
+  useEffect(() => {
+    const mode = searchParams.get('mode');
+    const registrationId = searchParams.get('registrationId');
+
+    if (mode === 'resume' && registrationId) {
+      setShowResume(true);
+      setResumeRegistrationId(registrationId);
+      // Automatically trigger resume
+      handleResumeWithId(registrationId);
+    }
+  }, [searchParams]);
+
+  const handleResumeWithId = async (regId) => {
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await resumeAustraliaAlphanumeric(regId);
+
+      if (response.success) {
+        setEmbedData(response.data);
+        console.log('Resumed Registration ID:', regId);
+      } else {
+        setError(response.error || 'Failed to resume registration');
+      }
+    } catch (err) {
+      setError(err.message || 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleInitialize = async (e) => {
     e.preventDefault();

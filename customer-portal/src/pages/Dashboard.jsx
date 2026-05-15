@@ -16,7 +16,7 @@ export default function Dashboard() {
       <header className="dashboard-header">
         <div>
           <h1>Customer Portal</h1>
-          <p>Update your Australia Alphanumeric Sender ID</p>
+          <p>Resume your Australia Alphanumeric Sender ID Registration</p>
         </div>
         <button onClick={handleLogout} className="btn btn-secondary">
           Logout
@@ -26,7 +26,7 @@ export default function Dashboard() {
       <div className="dashboard-content">
         <div className="iframe-container">
           <iframe
-            src="http://localhost:3010/au-alphanumeric"
+            src="http://localhost:3010/au-alphanumeric?mode=resume&registrationId=BU77003e1d07500d2f8a88536a2c446021"
             title="Australia Alphanumeric Sender ID Registration"
             style={{
               width: '100%',
