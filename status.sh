@@ -19,7 +19,7 @@ echo -e "${BLUE}╚════════════════════�
 echo ""
 
 SERVICES_RUNNING=0
-SERVICES_TOTAL=2
+SERVICES_TOTAL=4
 
 # Check Backend Status
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -74,9 +74,9 @@ fi
 
 echo ""
 
-# Check Frontend Status
+# Check ISV Demo Dashboard Status
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}Frontend Server${NC}"
+echo -e "${BLUE}ISV Demo Dashboard${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 if [ -f "$PID_DIR/frontend.pid" ]; then
@@ -121,6 +121,78 @@ fi
 
 echo ""
 
+# Check Customer Portal Status
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BLUE}Customer Portal${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+if [ -f "$PID_DIR/customer-portal.pid" ]; then
+    PORTAL_PID=$(cat "$PID_DIR/customer-portal.pid")
+    if ps -p $PORTAL_PID > /dev/null 2>&1; then
+        echo -e "   Status:     ${GREEN}✅ Running${NC}"
+        echo -e "   PID:        ${GREEN}$PORTAL_PID${NC}"
+
+        if curl -s http://localhost:3020 > /dev/null 2>&1; then
+            echo -e "   Health:     ${GREEN}✅ Responding${NC}"
+            echo -e "   URL:        ${GREEN}http://localhost:3020${NC}"
+            SERVICES_RUNNING=$((SERVICES_RUNNING + 1))
+        else
+            echo -e "   Health:     ${RED}❌ Not responding${NC}"
+        fi
+
+        CPU=$(ps -p $PORTAL_PID -o %cpu= | xargs)
+        MEM=$(ps -p $PORTAL_PID -o %mem= | xargs)
+        echo -e "   CPU:        ${BLUE}${CPU}%${NC}"
+        echo -e "   Memory:     ${BLUE}${MEM}%${NC}"
+    else
+        echo -e "   Status:     ${RED}❌ Not running (stale PID)${NC}"
+    fi
+else
+    echo -e "   Status:     ${YELLOW}⚠️  Not started${NC}"
+    if lsof -ti:3020 > /dev/null 2>&1; then
+        PORT_PID=$(lsof -ti:3020)
+        echo -e "   Port 3020:  ${YELLOW}⚠️  Occupied by PID $PORT_PID${NC}"
+    fi
+fi
+
+echo ""
+
+# Check CSM Dashboard Status
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${BLUE}CSM Dashboard${NC}"
+echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+
+if [ -f "$PID_DIR/csm-dashboard.pid" ]; then
+    DASHBOARD_PID=$(cat "$PID_DIR/csm-dashboard.pid")
+    if ps -p $DASHBOARD_PID > /dev/null 2>&1; then
+        echo -e "   Status:     ${GREEN}✅ Running${NC}"
+        echo -e "   PID:        ${GREEN}$DASHBOARD_PID${NC}"
+
+        if curl -s http://localhost:3030 > /dev/null 2>&1; then
+            echo -e "   Health:     ${GREEN}✅ Responding${NC}"
+            echo -e "   URL:        ${GREEN}http://localhost:3030${NC}"
+            SERVICES_RUNNING=$((SERVICES_RUNNING + 1))
+        else
+            echo -e "   Health:     ${RED}❌ Not responding${NC}"
+        fi
+
+        CPU=$(ps -p $DASHBOARD_PID -o %cpu= | xargs)
+        MEM=$(ps -p $DASHBOARD_PID -o %mem= | xargs)
+        echo -e "   CPU:        ${BLUE}${CPU}%${NC}"
+        echo -e "   Memory:     ${BLUE}${MEM}%${NC}"
+    else
+        echo -e "   Status:     ${RED}❌ Not running (stale PID)${NC}"
+    fi
+else
+    echo -e "   Status:     ${YELLOW}⚠️  Not started${NC}"
+    if lsof -ti:3030 > /dev/null 2>&1; then
+        PORT_PID=$(lsof -ti:3030)
+        echo -e "   Port 3030:  ${YELLOW}⚠️  Occupied by PID $PORT_PID${NC}"
+    fi
+fi
+
+echo ""
+
 # Overall Status
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${BLUE}Overall Status${NC}"
@@ -152,10 +224,16 @@ echo ""
 if [ $SERVICES_RUNNING -gt 0 ]; then
     echo -e "${BLUE}📝 Logs:${NC}"
     if [ -f "$SCRIPT_DIR/logs/backend.log" ]; then
-        echo -e "   Backend:  ${YELLOW}tail -f $SCRIPT_DIR/logs/backend.log${NC}"
+        echo -e "   Backend:         ${YELLOW}tail -f $SCRIPT_DIR/logs/backend.log${NC}"
     fi
     if [ -f "$SCRIPT_DIR/logs/frontend.log" ]; then
-        echo -e "   Frontend: ${YELLOW}tail -f $SCRIPT_DIR/logs/frontend.log${NC}"
+        echo -e "   ISV Demo:        ${YELLOW}tail -f $SCRIPT_DIR/logs/frontend.log${NC}"
+    fi
+    if [ -f "$SCRIPT_DIR/logs/customer-portal.log" ]; then
+        echo -e "   Customer Portal: ${YELLOW}tail -f $SCRIPT_DIR/logs/customer-portal.log${NC}"
+    fi
+    if [ -f "$SCRIPT_DIR/logs/csm-dashboard.log" ]; then
+        echo -e "   CSM Dashboard:   ${YELLOW}tail -f $SCRIPT_DIR/logs/csm-dashboard.log${NC}"
     fi
     echo ""
 fi
@@ -163,10 +241,12 @@ fi
 # Show available commands
 echo -e "${BLUE}📍 Available Commands:${NC}"
 if [ $SERVICES_RUNNING -eq 0 ]; then
-    echo -e "   Start:    ${GREEN}./start.sh${NC}"
+    echo -e "   Start ISV Demo:  ${GREEN}./start.sh${NC}"
+    echo -e "   Start All Apps:  ${GREEN}./start.sh --all${NC}"
 else
-    echo -e "   Stop:     ${YELLOW}./stop.sh${NC}"
-    echo -e "   Restart:  ${YELLOW}./stop.sh && ./start.sh${NC}"
+    echo -e "   Stop:            ${YELLOW}./stop.sh${NC}"
+    echo -e "   Restart:         ${YELLOW}./stop.sh && ./start.sh${NC}"
+    echo -e "   Restart All:     ${YELLOW}./stop.sh && ./start.sh --all${NC}"
 fi
 echo ""
 

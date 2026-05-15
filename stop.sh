@@ -114,6 +114,90 @@ if [ ! -z "$FRONTEND_PORT_PID" ]; then
     echo -e "${GREEN}   ✅ Port 3010 freed${NC}"
 fi
 
+echo ""
+
+# Stop Customer Portal
+if [ -f "$PID_DIR/customer-portal.pid" ]; then
+    PORTAL_PID=$(cat "$PID_DIR/customer-portal.pid")
+    if ps -p $PORTAL_PID > /dev/null 2>&1; then
+        echo -e "${BLUE}🛑 Stopping Customer Portal (PID: $PORTAL_PID)...${NC}"
+
+        PGID=$(ps -o pgid= $PORTAL_PID | grep -o '[0-9]*')
+        kill -- -$PGID 2>/dev/null || kill $PORTAL_PID 2>/dev/null
+
+        for i in {1..10}; do
+            if ! ps -p $PORTAL_PID > /dev/null 2>&1; then
+                echo -e "${GREEN}   ✅ Customer Portal stopped${NC}"
+                STOPPED_COUNT=$((STOPPED_COUNT + 1))
+                break
+            fi
+            sleep 1
+        done
+
+        if ps -p $PORTAL_PID > /dev/null 2>&1; then
+            kill -9 $PORTAL_PID 2>/dev/null
+            [ ! -z "$PGID" ] && kill -9 -- -$PGID 2>/dev/null
+            echo -e "${GREEN}   ✅ Customer Portal stopped (forced)${NC}"
+            STOPPED_COUNT=$((STOPPED_COUNT + 1))
+        fi
+    fi
+    rm -f "$PID_DIR/customer-portal.pid"
+fi
+
+# Kill any processes on port 3020
+PORTAL_PORT_PID=$(lsof -ti:3020 2>/dev/null)
+if [ ! -z "$PORTAL_PORT_PID" ]; then
+    echo -e "${BLUE}🛑 Stopping process on port 3020 (PID: $PORTAL_PORT_PID)...${NC}"
+    kill $PORTAL_PORT_PID 2>/dev/null
+    sleep 1
+    if lsof -ti:3020 > /dev/null 2>&1; then
+        kill -9 $PORTAL_PORT_PID 2>/dev/null
+    fi
+    echo -e "${GREEN}   ✅ Port 3020 freed${NC}"
+fi
+
+echo ""
+
+# Stop CSM Dashboard
+if [ -f "$PID_DIR/csm-dashboard.pid" ]; then
+    DASHBOARD_PID=$(cat "$PID_DIR/csm-dashboard.pid")
+    if ps -p $DASHBOARD_PID > /dev/null 2>&1; then
+        echo -e "${BLUE}🛑 Stopping CSM Dashboard (PID: $DASHBOARD_PID)...${NC}"
+
+        PGID=$(ps -o pgid= $DASHBOARD_PID | grep -o '[0-9]*')
+        kill -- -$PGID 2>/dev/null || kill $DASHBOARD_PID 2>/dev/null
+
+        for i in {1..10}; do
+            if ! ps -p $DASHBOARD_PID > /dev/null 2>&1; then
+                echo -e "${GREEN}   ✅ CSM Dashboard stopped${NC}"
+                STOPPED_COUNT=$((STOPPED_COUNT + 1))
+                break
+            fi
+            sleep 1
+        done
+
+        if ps -p $DASHBOARD_PID > /dev/null 2>&1; then
+            kill -9 $DASHBOARD_PID 2>/dev/null
+            [ ! -z "$PGID" ] && kill -9 -- -$PGID 2>/dev/null
+            echo -e "${GREEN}   ✅ CSM Dashboard stopped (forced)${NC}"
+            STOPPED_COUNT=$((STOPPED_COUNT + 1))
+        fi
+    fi
+    rm -f "$PID_DIR/csm-dashboard.pid"
+fi
+
+# Kill any processes on port 3030
+DASHBOARD_PORT_PID=$(lsof -ti:3030 2>/dev/null)
+if [ ! -z "$DASHBOARD_PORT_PID" ]; then
+    echo -e "${BLUE}🛑 Stopping process on port 3030 (PID: $DASHBOARD_PORT_PID)...${NC}"
+    kill $DASHBOARD_PORT_PID 2>/dev/null
+    sleep 1
+    if lsof -ti:3030 > /dev/null 2>&1; then
+        kill -9 $DASHBOARD_PORT_PID 2>/dev/null
+    fi
+    echo -e "${GREEN}   ✅ Port 3030 freed${NC}"
+fi
+
 # Kill any remaining react-scripts or node processes related to this project
 echo ""
 echo -e "${BLUE}🧹 Cleaning up remaining processes...${NC}"
@@ -142,5 +226,6 @@ fi
 
 echo ""
 echo -e "${BLUE}📍 To start again:${NC}"
-echo -e "   Run: ${GREEN}./start.sh${NC}"
+echo -e "   ISV Demo:     ${GREEN}./start.sh${NC}"
+echo -e "   All Apps:     ${GREEN}./start.sh --all${NC}"
 echo ""
